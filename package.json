@@ -1,0 +1,90 @@
+{
+  "name": "commit-assistant-kodyshi",
+  "displayName": "Commit Assistant With AI",
+  "description": "Generate Git commit messages with GitHub Copilot models.",
+  "version": "1.0.0",
+  "publisher": "KodyShi",
+  "engines": {
+    "vscode": "^1.95.0"
+  },
+  "categories": [
+    "AI"
+  ],
+  "main": "./out/extension.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Geek0x0/commit-assistant-vscode.git"
+  },
+  "contributes": {
+    "commands": [
+      {
+        "command": "commitAssistant.generateMessage",
+        "title": "Commit Assistant: Generate Commit Message"
+      },
+      {
+        "command": "commitAssistant.switchModel",
+        "title": "Commit Assistant: Switch Model"
+      },
+      {
+        "command": "commitAssistant.switchStyle",
+        "title": "Commit Assistant: Switch Style"
+      }
+    ],
+    "configuration": {
+      "title": "Commit Assistant",
+      "properties": {
+        "commitAssistant.model": {
+          "type": "string",
+          "default": "gpt-4.1",
+          "description": "Preferred GitHub Copilot model id/name for commit generation."
+        },
+        "commitAssistant.style": {
+          "type": "string",
+          "default": "conventional",
+          "enum": [
+            "auto",
+            "plain",
+            "conventional",
+            "angular",
+            "karma",
+            "semantic",
+            "emoji",
+            "emojiKarma",
+            "google",
+            "atom"
+          ],
+          "description": "Commit message style mode."
+        },
+        "commitAssistant.language": {
+          "type": "string",
+          "default": "english",
+          "enum": [
+            "english",
+            "chinese"
+          ],
+          "description": "Default output language for commit messages."
+        },
+        "commitAssistant.maxDiffChars": {
+          "type": "number",
+          "default": 16000,
+          "minimum": 2000,
+          "maximum": 60000,
+          "description": "Maximum diff characters sent to the model."
+        }
+      }
+    }
+  },
+  "icon": "./logo.png",
+  "scripts": {
+    "build": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "vscode:prepublish": "npm run build",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@vscode/vsce": "^3.6.2",
+    "@types/node": "^22.15.3",
+    "@types/vscode": "^1.95.0",
+    "typescript": "^5.8.3"
+  }
+}

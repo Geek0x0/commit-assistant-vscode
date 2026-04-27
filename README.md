@@ -1,27 +1,74 @@
 # Commit Assistant (VS Code Extension)
 
-Use GitHub Copilot models in VS Code to generate commit messages.
+Generate Git commit messages with AI models — powered by GitHub Copilot or your own custom AI endpoints.
+
+## Features
+
+- **AI-Powered Commit Messages** — Generate commit messages from git diff and related history.
+- **Optional Intent Input** — Describe what you intend to commit; the AI will prioritize your intent.
+- **Multiple AI Models** — Use GitHub Copilot models or add custom OpenAI-compatible endpoints.
+- **Multiple Languages** — Generate commit messages in 15 supported languages.
+- **Commit Styles** — Choose from conventional, angular, semantic, emoji, and more.
+- **Source Control Integration** — One-click button in the SCM panel to generate messages.
+- **Usage Statistics** — Track daily/monthly generation counts per model via the status bar.
+- **Bilingual UI** — Switch the extension UI between English and Chinese.
 
 ## Commands
 
-- `Commit Assistant: Generate Commit Message`
-  - First prompts for optional user intent.
-  - If input is provided, generation prioritizes that intent.
-  - If input is empty, generation relies on git diff and related history.
-  - The generated message is inserted into SCM input box when available, and always copied to clipboard.
-- `Commit Assistant: Switch Model`
-  - Select preferred model (default: `gpt-4.1`) or enter custom value.
-- `Commit Assistant: Switch Style`
-  - Select commit style mode.
+- **Commit Assistant: Generate Commit Message**
+  - Prompts for optional user intent. Leave empty to auto-analyze changes.
+  - The generated message is inserted into the SCM input box (when available) and copied to clipboard.
+- **Commit Assistant: Switch Model**
+  - Switch between GitHub Copilot models or custom models.
+  - Format: `copilot:<model>` or `custom:<name>`.
+- **Commit Assistant: Switch Style**
+  - Select commit message style: `auto`, `plain`, `conventional`, `angular`, `karma`, `semantic`, `emoji`, `emojiKarma`, `google`, `atom`.
+- **Commit Assistant: Switch Language**
+  - Select the output language for generated commit messages.
+- **Commit Assistant: Switch UI Language**
+  - Switch command titles and messages between English (`en`) and Chinese (`zh`).
+- **Commit Assistant: Add Custom Model**
+  - Register a custom AI model by providing name, API key, URL, and model ID.
+  - API keys are securely stored in VSCode SecretStorage.
+- **Commit Assistant: Remove Custom Model**
+  - Remove a previously added custom model.
+- **Commit Assistant: List Custom Models**
+  - View all configured custom models.
+- **Commit Assistant: Show Statistics**
+  - Open a dashboard showing daily/monthly usage per model.
+- **Commit Assistant: Clear Statistics**
+  - Reset all usage statistics.
 
 ## Settings
 
-- `commitAssistant.model` (string, default: `gpt-4.1`)
-- `commitAssistant.style` (enum, default: `conventional`)
-  - `auto`, `plain`, `conventional`, `angular`, `karma`, `semantic`, `emoji`, `emojiKarma`, `google`, `atom`
-- `commitAssistant.language` (enum, default: `english`)
-  - `english`, `chinese`
-- `commitAssistant.maxDiffChars` (number, default: `16000`)
+| Setting | Type | Default | Description |
+|---------|------|---------|-------------|
+| `commitAssistant.model` | `string` | `copilot:gpt-4.1` | Preferred model. Use `copilot:<model>` for GitHub Copilot or `custom:<name>` for custom models. |
+| `commitAssistant.style` | `enum` | `conventional` | Commit message style mode. |
+| `commitAssistant.language` | `enum` | `english` | Output language for commit messages. |
+| `commitAssistant.uiLanguage` | `enum` | `en` | UI language (`en` or `zh`). |
+| `commitAssistant.maxDiffChars` | `number` | `16000` | Maximum diff characters sent to the model (2000–60000). |
+| `commitAssistant.customModels` | `array` | `[]` | Custom model configurations (`name`, `url`, `model`). |
+
+### Supported Output Languages
+
+`english`, `chinese`, `spanish`, `french`, `german`, `japanese`, `korean`, `russian`, `portuguese`, `italian`, `dutch`, `turkish`, `polish`, `vietnamese`, `arabic`
+
+## Custom Models
+
+You can use any OpenAI-compatible API endpoint as a custom model:
+
+1. Run **Commit Assistant: Add Custom Model**.
+2. Enter a unique name (e.g., `my-openai`).
+3. Enter your API key — it will be stored securely in VSCode SecretStorage.
+4. Enter the API endpoint URL (e.g., `https://api.openai.com/v1/chat/completions`).
+5. Enter the model name (e.g., `gpt-4o`).
+
+Then set `commitAssistant.model` to `custom:my-openai`.
+
+## Usage Statistics
+
+A status bar item appears at the bottom-right of VSCode. Hover to see today's and this month's generation counts per model. Click to open a detailed dashboard.
 
 ## Development
 
@@ -38,5 +85,6 @@ Run extension in debug host:
 
 ## Notes
 
-- This extension uses VS Code Language Model API (`vscode.lm`) and requires GitHub Copilot model availability.
-- Templates in `src/prompts/templates.ts` follow the provided reference definitions.
+- GitHub Copilot models require the GitHub Copilot extension and a valid subscription.
+- Custom models use OpenAI-compatible chat completions format.
+- URL security validation blocks private IPs and localhost for safety.

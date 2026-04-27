@@ -10,6 +10,8 @@ interface Translation {
     addCustomModel: string;
     removeCustomModel: string;
     listCustomModels: string;
+    showStats: string;
+    clearStats: string;
   };
   prompts: {
     commitIntent: string;
@@ -76,6 +78,21 @@ interface Translation {
     modelRequired: string;
     modelTooLong: string;
   };
+  stats: {
+    tooltipTitle: string;
+    noData: string;
+    today: string;
+    thisMonth: string;
+    webviewTitle: string;
+    totalLabel: string;
+    dailyTitle: string;
+    monthlyTitle: string;
+    model: string;
+    date: string;
+    period: string;
+    count: string;
+    statsCleared: string;
+  };
 }
 
 const translations: Record<UiLanguage, Translation> = {
@@ -88,7 +105,9 @@ const translations: Record<UiLanguage, Translation> = {
       switchUiLanguage: 'Commit Assistant: Switch UI Language',
       addCustomModel: 'Commit Assistant: Add Custom Model',
       removeCustomModel: 'Commit Assistant: Remove Custom Model',
-      listCustomModels: 'Commit Assistant: List Custom Models'
+      listCustomModels: 'Commit Assistant: List Custom Models',
+      showStats: 'Commit Assistant: Show Statistics',
+      clearStats: 'Commit Assistant: Clear Statistics'
     },
     prompts: {
       commitIntent: 'Optional: describe your commit intent. Leave empty to auto-analyze changes.',
@@ -154,6 +173,21 @@ const translations: Record<UiLanguage, Translation> = {
       urlNotAllowed: 'This URL is not allowed for security reasons',
       modelRequired: 'Model name is required',
       modelTooLong: 'Model name must be {max} characters or less'
+    },
+    stats: {
+      tooltipTitle: 'Commit Assistant Stats',
+      noData: 'No usage data yet.',
+      today: 'Today',
+      thisMonth: 'This Month',
+      webviewTitle: 'Commit Assistant Statistics',
+      totalLabel: 'Total Generations per Model',
+      dailyTitle: 'Daily Usage',
+      monthlyTitle: 'Monthly Usage',
+      model: 'Model',
+      date: 'Date',
+      period: 'Period',
+      count: 'Count',
+      statsCleared: 'Statistics cleared.'
     }
   },
   zh: {
@@ -165,7 +199,9 @@ const translations: Record<UiLanguage, Translation> = {
       switchUiLanguage: '提交助手：切换界面语言',
       addCustomModel: '提交助手：添加自定义模型',
       removeCustomModel: '提交助手：移除自定义模型',
-      listCustomModels: '提交助手：列出自定义模型'
+      listCustomModels: '提交助手：列出自定义模型',
+      showStats: '提交助手：显示统计',
+      clearStats: '提交助手：清除统计'
     },
     prompts: {
       commitIntent: '可选：描述您的提交意图。留空将自动分析更改。',
@@ -231,6 +267,21 @@ const translations: Record<UiLanguage, Translation> = {
       urlNotAllowed: '出于安全原因，不允许此 URL',
       modelRequired: '模型名称为必填项',
       modelTooLong: '模型名称必须不超过 {max} 个字符'
+    },
+    stats: {
+      tooltipTitle: '提交助手统计',
+      noData: '暂无使用数据。',
+      today: '今日',
+      thisMonth: '本月',
+      webviewTitle: '提交助手统计',
+      totalLabel: '各模型总生成次数',
+      dailyTitle: '每日使用',
+      monthlyTitle: '每月使用',
+      model: '模型',
+      date: '日期',
+      period: '周期',
+      count: '次数',
+      statsCleared: '统计已清除。'
     }
   }
 };

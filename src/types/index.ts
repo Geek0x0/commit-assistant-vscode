@@ -6,7 +6,9 @@ export const COMMANDS = {
   switchUiLanguage: 'commitAssistant.switchUiLanguage',
   addCustomModel: 'commitAssistant.addCustomModel',
   removeCustomModel: 'commitAssistant.removeCustomModel',
-  listCustomModels: 'commitAssistant.listCustomModels'
+  listCustomModels: 'commitAssistant.listCustomModels',
+  showStats: 'commitAssistant.showStats',
+  clearStats: 'commitAssistant.clearStats'
 } as const;
 
 export type CommitStyle =
@@ -61,4 +63,13 @@ export interface CustomModelConfig {
   name: string;
   url: string;
   model: string;
+}
+
+export interface ModelStats {
+  daily: Record<string, number>;
+  monthly: Record<string, number>;
+}
+
+export interface StatsData {
+  models: Record<string, ModelStats>;
 }

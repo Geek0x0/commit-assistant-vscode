@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.3
+
+- Added usage statistics tracking with status bar item and webview dashboard.
+- Added daily and monthly generation counts grouped by model in global storage.
+- Added commands to show and clear statistics.
+
 ## 1.0.2
 
 - Added custom AI model support with add/remove/list commands.

@@ -2,7 +2,7 @@
   "name": "commit-assistant-kodyshi",
   "displayName": "Commit Assistant With AI",
   "description": "Generate Git commit messages with GitHub Copilot models.",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "publisher": "KodyShi",
   "engines": {
     "vscode": "^1.95.0"
@@ -28,8 +28,8 @@
     "commands": [
       {
         "command": "commitAssistant.generateMessage",
-        "title": "Generate Commit Message",
-        "icon": "$(sparkle)"
+        "title": "Commit Assistant",
+        "icon": "$(symbol-event)"
       },
       {
         "command": "commitAssistant.switchModel",
@@ -58,6 +58,14 @@
       {
         "command": "commitAssistant.listCustomModels",
         "title": "Commit Assistant: List Custom Models"
+      },
+      {
+        "command": "commitAssistant.showStats",
+        "title": "Commit Assistant: Show Statistics"
+      },
+      {
+        "command": "commitAssistant.clearStats",
+        "title": "Commit Assistant: Clear Statistics"
       }
     ],
     "configuration": {

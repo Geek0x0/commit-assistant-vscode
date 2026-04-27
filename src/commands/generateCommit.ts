@@ -4,6 +4,7 @@ import { collectGitContext, writeToScmInputBox } from '../core/gitService';
 import { generateWithCopilot } from '../core/lmService';
 import { generateWithCustomModel } from '../core/customModelService';
 import { buildPrompt, normalizeModelOutput } from '../core/promptBuilder';
+import { recordUsage } from '../services/statsService';
 
 export async function generateCommitMessageCommand(context: vscode.ExtensionContext): Promise<void> {
   const userInput = await vscode.window.showInputBox({
@@ -61,6 +62,8 @@ export async function generateCommitMessageCommand(context: vscode.ExtensionCont
 
         const inserted = await writeToScmInputBox(commitMessage);
         await vscode.env.clipboard.writeText(commitMessage);
+
+        await recordUsage(context.globalState, result.modelName);
 
         if (inserted) {
           vscode.window.showInformationMessage(

@@ -2,7 +2,7 @@
   "name": "commit-assistant-kodyshi",
   "displayName": "Commit Assistant With AI",
   "description": "Generate Git commit messages with GitHub Copilot models.",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "publisher": "KodyShi",
   "engines": {
     "vscode": "^1.95.0"
@@ -16,10 +16,20 @@
     "url": "https://github.com/Geek0x0/commit-assistant-vscode.git"
   },
   "contributes": {
+    "menus": {
+      "scm/title": [
+        {
+          "command": "commitAssistant.generateMessage",
+          "group": "navigation",
+          "when": "scmProvider == git"
+        }
+      ]
+    },
     "commands": [
       {
         "command": "commitAssistant.generateMessage",
-        "title": "Commit Assistant: Generate Commit Message"
+        "title": "Generate Commit Message",
+        "icon": "$(sparkle)"
       },
       {
         "command": "commitAssistant.switchModel",
@@ -28,6 +38,26 @@
       {
         "command": "commitAssistant.switchStyle",
         "title": "Commit Assistant: Switch Style"
+      },
+      {
+        "command": "commitAssistant.switchLanguage",
+        "title": "Commit Assistant: Switch Language"
+      },
+      {
+        "command": "commitAssistant.switchUiLanguage",
+        "title": "Commit Assistant: Switch UI Language"
+      },
+      {
+        "command": "commitAssistant.addCustomModel",
+        "title": "Commit Assistant: Add Custom Model"
+      },
+      {
+        "command": "commitAssistant.removeCustomModel",
+        "title": "Commit Assistant: Remove Custom Model"
+      },
+      {
+        "command": "commitAssistant.listCustomModels",
+        "title": "Commit Assistant: List Custom Models"
       }
     ],
     "configuration": {
@@ -35,8 +65,8 @@
       "properties": {
         "commitAssistant.model": {
           "type": "string",
-          "default": "gpt-4.1",
-          "description": "Preferred GitHub Copilot model id/name for commit generation."
+          "default": "copilot:gpt-4.1",
+          "description": "Preferred model for commit generation. Use copilot:<model> for GitHub Copilot or custom:<name> for a custom model."
         },
         "commitAssistant.style": {
           "type": "string",
@@ -60,9 +90,31 @@
           "default": "english",
           "enum": [
             "english",
-            "chinese"
+            "chinese",
+            "spanish",
+            "french",
+            "german",
+            "japanese",
+            "korean",
+            "russian",
+            "portuguese",
+            "italian",
+            "dutch",
+            "turkish",
+            "polish",
+            "vietnamese",
+            "arabic"
           ],
           "description": "Default output language for commit messages."
+        },
+        "commitAssistant.uiLanguage": {
+          "type": "string",
+          "default": "en",
+          "enum": [
+            "en",
+            "zh"
+          ],
+          "description": "UI language for command titles and messages."
         },
         "commitAssistant.maxDiffChars": {
           "type": "number",
@@ -70,6 +122,33 @@
           "minimum": 2000,
           "maximum": 60000,
           "description": "Maximum diff characters sent to the model."
+        },
+        "commitAssistant.customModels": {
+          "type": "array",
+          "default": [],
+          "description": "Custom AI model configurations. Each item must have name, url, and model fields.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Unique identifier for this custom model"
+              },
+              "url": {
+                "type": "string",
+                "description": "API endpoint URL"
+              },
+              "model": {
+                "type": "string",
+                "description": "Model name passed to the API"
+              }
+            },
+            "required": [
+              "name",
+              "url",
+              "model"
+            ]
+          }
         }
       }
     }
@@ -82,9 +161,12 @@
     "package": "vsce package"
   },
   "devDependencies": {
-    "@vscode/vsce": "^3.6.2",
+    "@types/jest": "^30.0.0",
     "@types/node": "^22.15.3",
     "@types/vscode": "^1.95.0",
+    "@vscode/vsce": "^2.25.0",
+    "jest": "^30.3.0",
+    "ts-jest": "^29.4.9",
     "typescript": "^5.8.3"
   }
 }

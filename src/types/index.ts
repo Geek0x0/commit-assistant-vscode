@@ -1,7 +1,12 @@
 export const COMMANDS = {
   generateMessage: 'commitAssistant.generateMessage',
   switchModel: 'commitAssistant.switchModel',
-  switchStyle: 'commitAssistant.switchStyle'
+  switchStyle: 'commitAssistant.switchStyle',
+  switchLanguage: 'commitAssistant.switchLanguage',
+  switchUiLanguage: 'commitAssistant.switchUiLanguage',
+  addCustomModel: 'commitAssistant.addCustomModel',
+  removeCustomModel: 'commitAssistant.removeCustomModel',
+  listCustomModels: 'commitAssistant.listCustomModels'
 } as const;
 
 export type CommitStyle =
@@ -16,13 +21,31 @@ export type CommitStyle =
   | 'google'
   | 'atom';
 
-export type CommitLanguage = 'english' | 'chinese';
+export type CommitLanguage =
+  | 'english'
+  | 'chinese'
+  | 'spanish'
+  | 'french'
+  | 'german'
+  | 'japanese'
+  | 'korean'
+  | 'russian'
+  | 'portuguese'
+  | 'italian'
+  | 'dutch'
+  | 'turkish'
+  | 'polish'
+  | 'vietnamese'
+  | 'arabic';
+
+export type UiLanguage = 'en' | 'zh';
 
 export interface ExtensionSettings {
   model: string;
   style: CommitStyle;
   language: CommitLanguage;
   maxDiffChars: number;
+  uiLanguage: UiLanguage;
 }
 
 export interface GitContext {
@@ -32,4 +55,10 @@ export interface GitContext {
   untrackedSummary: string;
   changedFiles: string[];
   relatedHistory: string;
+}
+
+export interface CustomModelConfig {
+  name: string;
+  url: string;
+  model: string;
 }

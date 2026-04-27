@@ -1,24 +1,61 @@
 import * as vscode from 'vscode';
 import { getSettings, setModel } from '../config/settings';
 import { listAvailableModelNames } from '../core/lmService';
+import { getCustomModels } from '../config/settings';
+
+interface ModelPickItem extends vscode.QuickPickItem {
+  fullId?: string;
+}
 
 export async function switchModelCommand(): Promise<void> {
   try {
-    const models = await listAvailableModelNames();
+    const copilotModels = await listAvailableModelNames();
+    const customModels = getCustomModels();
     const current = getSettings().model;
 
-    const picks = models.map((name) => ({
-      label: name,
-      description: name === current ? 'Current' : undefined
-    }));
+    const picks: ModelPickItem[] = [];
 
+    if (copilotModels.length > 0) {
+      picks.push({
+        label: 'GitHub Copilot',
+        kind: vscode.QuickPickItemKind.Separator
+      });
+      for (const name of copilotModels) {
+        const fullId = `copilot:${name}`;
+        picks.push({
+          label: name,
+          fullId,
+          description: fullId === current ? 'Current' : undefined
+        });
+      }
+    }
+
+    if (customModels.length > 0) {
+      picks.push({
+        label: 'Custom Models',
+        kind: vscode.QuickPickItemKind.Separator
+      });
+      for (const m of customModels) {
+        const fullId = `custom:${m.name}`;
+        picks.push({
+          label: m.name,
+          fullId,
+          description: `${m.model} @ ${m.url}${fullId === current ? ' — Current' : ''}`
+        });
+      }
+    }
+
+    picks.push({
+      label: 'Other',
+      kind: vscode.QuickPickItemKind.Separator
+    });
     picks.push({ label: '$(edit) Enter custom model id', description: 'Custom' });
 
     const selected = await vscode.window.showQuickPick(picks, {
       placeHolder: 'Select a model for commit generation'
     });
 
-    if (!selected) {
+    if (!selected || selected.kind === vscode.QuickPickItemKind.Separator) {
       return;
     }
 
@@ -26,7 +63,7 @@ export async function switchModelCommand(): Promise<void> {
 
     if (selected.description === 'Custom') {
       const custom = await vscode.window.showInputBox({
-        prompt: 'Enter model id/name',
+        prompt: 'Enter model id/name (prefix with copilot: or custom:)',
         value: current,
         ignoreFocusOut: true
       });
@@ -34,6 +71,8 @@ export async function switchModelCommand(): Promise<void> {
         return;
       }
       nextModel = custom.trim();
+    } else if (selected.fullId) {
+      nextModel = selected.fullId;
     }
 
     await setModel(nextModel);

@@ -1,15 +1,32 @@
-import type { GitContext } from '../types';
+import type { CommitLanguage, GitContext } from '../types';
 import { getSettings } from '../config/settings';
 import { getTemplate } from '../prompts/templates';
 
-function languageInstruction(language: 'english' | 'chinese'): string {
-  return language === 'chinese'
-    ? 'Please write the commit message in Chinese.'
-    : 'Please write the commit message in English.';
+const LANGUAGE_NAMES: Record<CommitLanguage, string> = {
+  english: 'English',
+  chinese: 'Chinese',
+  spanish: 'Spanish',
+  french: 'French',
+  german: 'German',
+  japanese: 'Japanese',
+  korean: 'Korean',
+  russian: 'Russian',
+  portuguese: 'Portuguese',
+  italian: 'Italian',
+  dutch: 'Dutch',
+  turkish: 'Turkish',
+  polish: 'Polish',
+  vietnamese: 'Vietnamese',
+  arabic: 'Arabic'
+};
+
+function languageInstruction(language: CommitLanguage): string {
+  const name = LANGUAGE_NAMES[language];
+  return `Please write the commit message in ${name}.`;
 }
 
-function buildAutoStyleInstruction(language: 'english' | 'chinese'): string {
-  const fallbackLanguage = language === 'chinese' ? 'Chinese' : 'English';
+function buildAutoStyleInstruction(language: CommitLanguage): string {
+  const fallbackLanguage = LANGUAGE_NAMES[language];
 
   return `Generate a commit message that matches this repository's existing commit message style.
 

@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.4
+
+- When user provides commit intent input, the message is now generated purely from that intent without collecting git diff.
+- Fixed `uiLanguage` setting — all UI strings (prompts, messages, validations, errors) are now properly localized.
+- Added full Chinese (`zh`) translations for all command messages, input validations, and notifications.
+
 ## 1.0.3
 
 - Added usage statistics tracking with status bar item and webview dashboard.

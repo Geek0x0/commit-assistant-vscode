@@ -5,6 +5,7 @@ import * as path from 'path';
 import * as fs from 'fs/promises';
 import { getSettings } from '../config/settings';
 import type { GitContext } from '../types';
+import { t } from '../i18n';
 
 const execFileAsync = promisify(execFile);
 
@@ -34,7 +35,7 @@ async function runGit(repoPath: string, args: string[]): Promise<string> {
 function getWorkspaceRepoPath(): string {
   const folder = vscode.workspace.workspaceFolders?.[0];
   if (!folder) {
-    throw new Error('No workspace folder is opened.');
+    throw new Error(t().messages.noWorkspace);
   }
   return folder.uri.fsPath;
 }
@@ -43,7 +44,7 @@ async function ensureGitRepo(repoPath: string): Promise<void> {
   try {
     await runGit(repoPath, ['rev-parse', '--is-inside-work-tree']);
   } catch {
-    throw new Error('Current workspace is not a git repository.');
+    throw new Error(t().messages.notGitRepo);
   }
 }
 
@@ -150,7 +151,7 @@ export async function collectGitContext(token?: vscode.CancellationToken): Promi
   );
 
   if (!stagedDiff && !unstagedDiff && changedFiles.length === 0) {
-    throw new Error('No changes detected.');
+    throw new Error(t().messages.noChanges);
   }
 
   const untrackedSummary = await summarizeUntracked(repoPath, untrackedFiles, Math.floor(maxDiffChars / 2), token);

@@ -3,13 +3,14 @@ import { getSettings, getCustomModels, getCustomModelApiKeySecretKey } from '../
 import { collectGitContext, writeToScmInputBox } from '../core/gitService';
 import { generateWithCopilot } from '../core/lmService';
 import { generateWithCustomModel } from '../core/customModelService';
-import { buildPrompt, normalizeModelOutput } from '../core/promptBuilder';
+import { buildPrompt, buildUserOnlyPrompt, normalizeModelOutput } from '../core/promptBuilder';
 import { recordUsage } from '../services/statsService';
+import { t, formatTemplate } from '../i18n';
 
 export async function generateCommitMessageCommand(context: vscode.ExtensionContext): Promise<void> {
   const userInput = await vscode.window.showInputBox({
-    prompt: 'Optional: describe your commit intent. Leave empty to auto-analyze changes.',
-    placeHolder: 'Example: refactor API error handling and improve timeout behavior',
+    prompt: t().prompts.commitIntent,
+    placeHolder: t().prompts.commitIntentPlaceholder,
     ignoreFocusOut: true
   });
 
@@ -21,18 +22,25 @@ export async function generateCommitMessageCommand(context: vscode.ExtensionCont
         cancellable: true
       },
       async (progress, token) => {
-        progress.report({ message: 'Collecting git changes...' });
-        const gitContext = await collectGitContext(token);
+        let prompt: string;
 
-        progress.report({ message: 'Building AI prompt...' });
-        const prompt = buildPrompt(userInput, gitContext);
+        if (userInput?.trim()) {
+          progress.report({ message: t().messages.buildingPrompt });
+          prompt = buildUserOnlyPrompt(userInput.trim());
+        } else {
+          progress.report({ message: t().messages.collectingChanges });
+          const gitContext = await collectGitContext(token);
+
+          progress.report({ message: t().messages.buildingPrompt });
+          prompt = buildPrompt(userInput, gitContext);
+        }
 
         const settings = getSettings();
         const { provider, modelName } = parseModelSetting(settings.model);
-        progress.report({ message: `Generating with ${modelName}...` });
+        progress.report({ message: formatTemplate(t().messages.generating, { model: modelName }) });
 
         if (!modelName) {
-          throw new Error('Invalid model setting: model name cannot be empty');
+          throw new Error(t().messages.invalidModelSetting);
         }
 
         let result: { message: string; modelName: string };
@@ -41,12 +49,12 @@ export async function generateCommitMessageCommand(context: vscode.ExtensionCont
           const customModels = getCustomModels();
           const customConfig = customModels.find((m) => m.name === modelName);
           if (!customConfig) {
-            throw new Error(`Custom model "${modelName}" not found. Add it via "Commit Assistant: Add Custom Model".`);
+            throw new Error(formatTemplate(t().messages.customModelNotFound, { name: modelName }));
           }
 
           const apiKey = await context.secrets.get(getCustomModelApiKeySecretKey(modelName));
           if (!apiKey) {
-            throw new Error(`API key for custom model "${modelName}" not found. Please reconfigure the model.`);
+            throw new Error(formatTemplate(t().messages.apiKeyNotFound, { name: modelName }));
           }
 
           result = await generateWithCustomModel(prompt, customConfig, apiKey, token);
@@ -57,7 +65,7 @@ export async function generateCommitMessageCommand(context: vscode.ExtensionCont
         const commitMessage = normalizeModelOutput(result.message);
 
         if (!commitMessage) {
-          throw new Error('Model returned an empty commit message.');
+          throw new Error(t().messages.emptyCommitMessage);
         }
 
         const inserted = await writeToScmInputBox(commitMessage);
@@ -67,11 +75,11 @@ export async function generateCommitMessageCommand(context: vscode.ExtensionCont
 
         if (inserted) {
           vscode.window.showInformationMessage(
-            `Commit message generated with ${result.modelName} and inserted into SCM input.`
+            formatTemplate(t().messages.commitGeneratedInserted, { model: result.modelName })
           );
         } else {
           vscode.window.showInformationMessage(
-            `Commit message generated with ${result.modelName} and copied to clipboard.`
+            formatTemplate(t().messages.commitGeneratedCopied, { model: result.modelName })
           );
         }
       }
@@ -81,7 +89,7 @@ export async function generateCommitMessageCommand(context: vscode.ExtensionCont
       return;
     }
     const message = error instanceof Error ? error.message : String(error);
-    vscode.window.showErrorMessage(`Failed to generate commit message: ${message}`);
+    vscode.window.showErrorMessage(`${t().errors.generateFailed} ${message}`);
   }
 }
 

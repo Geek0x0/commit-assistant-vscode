@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { getSettings, setStyle } from '../config/settings';
 import { getSelectableStyles } from '../prompts/templates';
+import { t } from '../i18n';
 
 export async function switchStyleCommand(): Promise<void> {
   const current = getSettings().style;
@@ -11,7 +12,7 @@ export async function switchStyleCommand(): Promise<void> {
       label: style,
       description: style === current ? 'Current' : undefined
     })),
-    { placeHolder: 'Select commit message style' }
+    { placeHolder: t().prompts.selectStyle }
   );
 
   if (!pick) {
@@ -19,5 +20,5 @@ export async function switchStyleCommand(): Promise<void> {
   }
 
   await setStyle(pick.label as typeof current);
-  vscode.window.showInformationMessage(`Commit Assistant style set to: ${pick.label}`);
+  vscode.window.showInformationMessage(`${t().messages.styleSet} ${pick.label}`);
 }

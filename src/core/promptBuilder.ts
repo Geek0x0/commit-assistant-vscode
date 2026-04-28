@@ -42,6 +42,24 @@ Rules:
 7. Output the commit message only.`;
 }
 
+export function buildUserOnlyPrompt(userInput: string): string {
+  const settings = getSettings();
+
+  const stylePrompt =
+    settings.style === 'auto'
+      ? `Generate a concise commit message in a standard style.`
+      : `${getTemplate(settings.style)}\n\n${languageInstruction(settings.language)}`;
+
+  return `${stylePrompt}
+
+User intent for this commit:
+${userInput}
+
+Based on the user's description above, generate an appropriate commit message.
+
+IMPORTANT: Return ONLY the commit message text, no markdown fences, no explanation.`;
+}
+
 export function buildPrompt(userInput: string | undefined, context: GitContext): string {
   const settings = getSettings();
 

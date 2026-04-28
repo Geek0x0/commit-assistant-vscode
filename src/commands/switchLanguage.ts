@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { getSettings, setLanguage } from '../config/settings';
 import type { CommitLanguage } from '../types';
+import { t } from '../i18n';
 
 const LANGUAGE_OPTIONS: { label: string; value: CommitLanguage }[] = [
   { label: 'English', value: 'english' },
@@ -29,7 +30,7 @@ export async function switchLanguageCommand(): Promise<void> {
       description: opt.value === current ? 'Current' : undefined,
       value: opt.value
     })),
-    { placeHolder: 'Select output language for commit messages' }
+    { placeHolder: t().prompts.selectLanguage }
   );
 
   if (!pick) {
@@ -37,5 +38,5 @@ export async function switchLanguageCommand(): Promise<void> {
   }
 
   await setLanguage(pick.value);
-  vscode.window.showInformationMessage(`Commit Assistant language set to: ${pick.label}`);
+  vscode.window.showInformationMessage(`${t().messages.languageSet} ${pick.label}`);
 }

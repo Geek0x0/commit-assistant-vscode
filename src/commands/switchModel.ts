@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { getSettings, setModel } from '../config/settings';
 import { listAvailableModelNames } from '../core/lmService';
 import { getCustomModels } from '../config/settings';
+import { t, formatTemplate } from '../i18n';
 
 interface ModelPickItem extends vscode.QuickPickItem {
   fullId?: string;
@@ -52,7 +53,7 @@ export async function switchModelCommand(): Promise<void> {
     picks.push({ label: '$(edit) Enter custom model id', description: 'Custom' });
 
     const selected = await vscode.window.showQuickPick(picks, {
-      placeHolder: 'Select a model for commit generation'
+      placeHolder: t().prompts.selectModel
     });
 
     if (!selected || selected.kind === vscode.QuickPickItemKind.Separator) {
@@ -76,9 +77,9 @@ export async function switchModelCommand(): Promise<void> {
     }
 
     await setModel(nextModel);
-    vscode.window.showInformationMessage(`Commit Assistant model set to: ${nextModel}`);
+    vscode.window.showInformationMessage(`${t().messages.modelSet} ${nextModel}`);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    vscode.window.showErrorMessage(`Failed to switch model: ${message}`);
+    vscode.window.showErrorMessage(`${t().errors.switchModelFailed} ${message}`);
   }
 }

@@ -4,14 +4,14 @@ Generate Git commit messages with AI models — powered by GitHub Copilot or you
 
 ## Features
 
-- **AI-Powered Commit Messages** — Generate commit messages from git diff and related history.
-- **Optional Intent Input** — Describe what you intend to commit; the AI will prioritize your intent.
+- **AI-Powered Commit Messages** — Generate commit messages from git diff and related history, or purely from your own description.
+- **Optional Intent Input** — Describe what you intend to commit; leave empty to auto-analyze changes. When provided, the message is generated solely from your description.
 - **Multiple AI Models** — Use GitHub Copilot models or add custom OpenAI-compatible endpoints.
 - **Multiple Languages** — Generate commit messages in 15 supported languages.
 - **Commit Styles** — Choose from conventional, angular, semantic, emoji, and more.
 - **Source Control Integration** — One-click button in the SCM panel to generate messages.
 - **Usage Statistics** — Track daily/monthly generation counts per model via the status bar.
-- **Bilingual UI** — Switch the extension UI between English and Chinese.
+- **Bilingual UI** — Switch the extension UI between English and Chinese. All prompts, messages, validations, and errors are fully localized.
 
 ## Commands
 

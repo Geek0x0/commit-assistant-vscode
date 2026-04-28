@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import type { CustomModelConfig } from '../types';
 import { getCustomModels, saveCustomModels, getCustomModelApiKeySecretKey } from '../config/settings';
 import { isUrlAllowed } from '../core/customModelService';
+import { t, formatTemplate } from '../i18n';
 
 const MAX_CUSTOM_MODELS = 20;
 const MAX_NAME_LENGTH = 64;
@@ -11,27 +12,27 @@ const MAX_MODEL_LENGTH = 128;
 export async function addCustomModelCommand(context: vscode.ExtensionContext): Promise<void> {
   const existing = getCustomModels();
   if (existing.length >= MAX_CUSTOM_MODELS) {
-    vscode.window.showWarningMessage(`You can only configure up to ${MAX_CUSTOM_MODELS} custom models. Remove one first.`);
+    vscode.window.showWarningMessage(formatTemplate(t().messages.maxModelsReached, { max: MAX_CUSTOM_MODELS }));
     return;
   }
 
   const name = await vscode.window.showInputBox({
-    prompt: 'Enter a unique name for this custom model (e.g., my-openai)',
-    placeHolder: 'my-openai',
+    prompt: t().prompts.modelName,
+    placeHolder: t().prompts.modelNamePlaceholder,
     ignoreFocusOut: true,
     validateInput: (value) => {
       const trimmed = value.trim();
       if (!trimmed) {
-        return 'Name is required';
+        return t().validations.nameRequired;
       }
       if (trimmed.length > MAX_NAME_LENGTH) {
-        return `Name must be ${MAX_NAME_LENGTH} characters or less`;
+        return formatTemplate(t().validations.nameTooLong, { max: MAX_NAME_LENGTH });
       }
       if (!/^[a-zA-Z0-9_-]+$/.test(trimmed)) {
-        return 'Name can only contain letters, numbers, hyphens, and underscores';
+        return t().validations.nameInvalidChars;
       }
       if (existing.some((m) => m.name === trimmed)) {
-        return `A model named "${trimmed}" already exists`;
+        return formatTemplate(t().validations.nameExists, { name: trimmed });
       }
       return null;
     }
@@ -42,13 +43,13 @@ export async function addCustomModelCommand(context: vscode.ExtensionContext): P
   }
 
   const apiKey = await vscode.window.showInputBox({
-    prompt: `Enter API key for "${name}"`,
+    prompt: formatTemplate(t().prompts.apiKey, { name }),
     placeHolder: 'sk-...',
     ignoreFocusOut: true,
     password: true,
     validateInput: (value) => {
       if (!value?.trim()) {
-        return 'API key is required';
+        return t().validations.apiKeyRequired;
       }
       return null;
     }
@@ -59,28 +60,28 @@ export async function addCustomModelCommand(context: vscode.ExtensionContext): P
   }
 
   const url = await vscode.window.showInputBox({
-    prompt: `Enter API endpoint URL for "${name}"`,
-    placeHolder: 'https://api.openai.com/v1/chat/completions',
+    prompt: formatTemplate(t().prompts.url, { name }),
+    placeHolder: t().prompts.urlPlaceholder,
     ignoreFocusOut: true,
     validateInput: (value) => {
       const trimmed = value.trim();
       if (!trimmed) {
-        return 'URL is required';
+        return t().validations.urlRequired;
       }
       if (trimmed.length > MAX_URL_LENGTH) {
-        return `URL must be ${MAX_URL_LENGTH} characters or less`;
+        return formatTemplate(t().validations.urlTooLong, { max: MAX_URL_LENGTH });
       }
       let urlObj: URL;
       try {
         urlObj = new URL(trimmed);
       } catch {
-        return 'Please enter a valid URL';
+        return t().validations.urlInvalid;
       }
       if (urlObj.protocol !== 'https:' && urlObj.protocol !== 'http:') {
-        return 'Only HTTP and HTTPS URLs are allowed';
+        return t().validations.urlProtocolNotAllowed;
       }
       if (!isUrlAllowed(trimmed)) {
-        return 'This URL is not allowed for security reasons';
+        return t().validations.urlNotAllowed;
       }
       return null;
     }
@@ -91,16 +92,16 @@ export async function addCustomModelCommand(context: vscode.ExtensionContext): P
   }
 
   const model = await vscode.window.showInputBox({
-    prompt: `Enter model name for "${name}"`,
-    placeHolder: 'gpt-4o',
+    prompt: formatTemplate(t().prompts.modelId, { name }),
+    placeHolder: t().prompts.modelIdPlaceholder,
     ignoreFocusOut: true,
     validateInput: (value) => {
       const trimmed = value.trim();
       if (!trimmed) {
-        return 'Model name is required';
+        return t().validations.modelRequired;
       }
       if (trimmed.length > MAX_MODEL_LENGTH) {
-        return `Model name must be ${MAX_MODEL_LENGTH} characters or less`;
+        return formatTemplate(t().validations.modelTooLong, { max: MAX_MODEL_LENGTH });
       }
       return null;
     }
@@ -119,13 +120,13 @@ export async function addCustomModelCommand(context: vscode.ExtensionContext): P
   await saveCustomModels([...existing, config]);
   await context.secrets.store(getCustomModelApiKeySecretKey(name.trim()), apiKey.trim());
 
-  vscode.window.showInformationMessage(`Custom model "${name}" added successfully.`);
+  vscode.window.showInformationMessage(t().messages.customModelAdded);
 }
 
 export async function removeCustomModelCommand(context: vscode.ExtensionContext): Promise<void> {
   const models = getCustomModels();
   if (models.length === 0) {
-    vscode.window.showInformationMessage('No custom models configured.');
+    vscode.window.showInformationMessage(t().messages.noCustomModels);
     return;
   }
 
@@ -134,7 +135,7 @@ export async function removeCustomModelCommand(context: vscode.ExtensionContext)
       label: m.name,
       description: `${m.model} @ ${m.url}`
     })),
-    { placeHolder: 'Select a custom model to remove' }
+    { placeHolder: t().prompts.selectCustomModelToRemove }
   );
 
   if (!pick) {
@@ -142,12 +143,12 @@ export async function removeCustomModelCommand(context: vscode.ExtensionContext)
   }
 
   const confirmed = await vscode.window.showWarningMessage(
-    `Remove custom model "${pick.label}"?`,
+    `${t().messages.confirmRemove} "${pick.label}"?`,
     { modal: true },
-    'Remove'
+    t().messages.remove
   );
 
-  if (confirmed !== 'Remove') {
+  if (confirmed !== t().messages.remove) {
     return;
   }
 
@@ -156,19 +157,19 @@ export async function removeCustomModelCommand(context: vscode.ExtensionContext)
   await saveCustomModels(updated);
   await context.secrets.delete(getCustomModelApiKeySecretKey(targetName));
 
-  vscode.window.showInformationMessage(`Custom model "${targetName}" removed.`);
+  vscode.window.showInformationMessage(t().messages.customModelRemoved);
 }
 
 export async function listCustomModelsCommand(): Promise<void> {
   const models = getCustomModels();
   if (models.length === 0) {
-    vscode.window.showInformationMessage('No custom models configured.');
+    vscode.window.showInformationMessage(t().messages.noCustomModels);
     return;
   }
 
   const panel = vscode.window.createWebviewPanel(
     'commitAssistantCustomModels',
-    'Custom Models',
+    t().commands.listCustomModels,
     vscode.ViewColumn.One,
     { enableScripts: false }
   );
@@ -186,7 +187,7 @@ export async function listCustomModelsCommand(): Promise<void> {
   </style>
 </head>
 <body>
-  <h2>Configured Custom Models (${models.length})</h2>
+  <h2>${escapeHtml(t().commands.listCustomModels)} (${models.length})</h2>
   ${models
     .map(
       (m) => `

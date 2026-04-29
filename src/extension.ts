@@ -22,7 +22,9 @@ function refreshStatusBar(globalState: vscode.Memento): void {
     return;
   }
   const stats = getStats(globalState);
-  statusBarItem.tooltip = buildTooltipText(stats);
+  const md = new vscode.MarkdownString(buildTooltipText(stats));
+  md.isTrusted = true;
+  statusBarItem.tooltip = md;
 }
 
 export function activate(context: vscode.ExtensionContext): void {
@@ -30,7 +32,7 @@ export function activate(context: vscode.ExtensionContext): void {
   setUiLanguage(settings.uiLanguage);
 
   statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
-  statusBarItem.text = '$(graph-line)';
+  statusBarItem.text = '$(pie-chart)';
   statusBarItem.command = COMMANDS.showStats;
   refreshStatusBar(context.globalState);
   statusBarItem.show();

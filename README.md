@@ -68,7 +68,7 @@ Then set `commitAssistant.model` to `custom:my-openai`.
 
 ## Usage Statistics
 
-A status bar item appears at the bottom-right of VSCode. Hover to see today's and this month's generation counts per model. Click to open a detailed dashboard.
+A status bar item appears at the bottom-right of VSCode. Hover to see a formatted table with today's and this month's generation counts per model. Click to open a detailed dashboard.
 
 ## Development
 

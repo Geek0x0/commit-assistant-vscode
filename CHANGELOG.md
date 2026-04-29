@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.5
+
+- Improved status bar statistics tooltip — now renders as a formatted Markdown table with Model, Total, Today, and This Month columns.
+- Added unit tests for `promptBuilder`, `i18n`, `statsService`, and `templates` modules (57 tests, 65% coverage).
+
 ## 1.0.4
 
 - When user provides commit intent input, the message is now generated purely from that intent without collecting git diff.

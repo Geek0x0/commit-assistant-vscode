@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import type { StatsData } from '../types';
-import { t } from '../i18n';
+import { t, formatTemplate } from '../i18n';
 
 const STATS_KEY = 'commitAssistant.stats';
 
@@ -76,24 +76,25 @@ export async function clearStats(globalState: vscode.Memento): Promise<void> {
 }
 
 export function buildTooltipText(stats: StatsData): string {
+  const tr = t().stats;
   const models = Object.keys(stats.models);
   if (models.length === 0) {
-    return `${t().stats.tooltipTitle}\n${t().stats.noData}`;
+    return `${tr.tooltipTitle}\n\n${tr.noData}`;
   }
 
   const now = new Date();
   const todayKey = formatDate(now);
   const thisMonthKey = formatMonth(now);
 
-  const lines: string[] = [t().stats.tooltipTitle];
-  for (const model of models) {
-    const modelStats = stats.models[model];
-    const dailyTotal = Object.values(modelStats.daily).reduce((sum, c) => sum + c, 0);
-    const todayCount = modelStats.daily[todayKey] ?? 0;
-    const thisMonthCount = modelStats.monthly[thisMonthKey] ?? 0;
+  const header = `| Model | Total | ${tr.today} | ${tr.thisMonth} |`;
+  const sep = '|:------|------:|------:|----------:|';
+  const rows = models.map((model) => {
+    const ms = stats.models[model];
+    const total = Object.values(ms.daily).reduce((sum, c) => sum + c, 0);
+    const today = ms.daily[todayKey] ?? 0;
+    const month = ms.monthly[thisMonthKey] ?? 0;
+    return `| ${model} | ${total} | ${today} | ${month} |`;
+  });
 
-    lines.push(`${model}: ${dailyTotal} | ${t().stats.today}: ${todayCount} | ${t().stats.thisMonth}: ${thisMonthCount}`);
-  }
-
-  return lines.join('\n');
+  return `${tr.tooltipTitle}\n\n${header}\n${sep}\n${rows.join('\n')}`;
 }

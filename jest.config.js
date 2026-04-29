@@ -10,20 +10,18 @@ module.exports = {
   collectCoverageFrom: [
     'src/types/index.ts',
     'src/core/customModelService.ts',
-    'src/config/settings.ts'
+    'src/core/promptBuilder.ts',
+    'src/config/settings.ts',
+    'src/i18n/index.ts',
+    'src/services/statsService.ts',
+    'src/prompts/templates.ts'
   ],
   coverageThreshold: {
-    'src/core/customModelService.ts': {
-      statements: 30,
-      branches: 20,
-      lines: 30,
-      functions: 15
-    },
-    'src/config/settings.ts': {
-      statements: 50,
-      branches: 0,
-      lines: 50,
-      functions: 10
+    global: {
+      statements: 60,
+      branches: 40,
+      lines: 60,
+      functions: 40
     }
   }
 };

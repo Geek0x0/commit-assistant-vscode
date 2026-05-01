@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { COMMANDS } from './types';
 import { getSettings } from './config/settings';
 import { setUiLanguage, t } from './i18n';
+import { getOutputChannel, disposeOutputChannel } from './log';
 import { generateCommitMessageCommand } from './commands/generateCommit';
 import { switchModelCommand } from './commands/switchModel';
 import { switchStyleCommand } from './commands/switchStyle';
@@ -38,6 +39,7 @@ export function activate(context: vscode.ExtensionContext): void {
   statusBarItem.show();
 
   context.subscriptions.push(
+    getOutputChannel(),
     statusBarItem,
     vscode.commands.registerCommand(COMMANDS.generateMessage, async () => {
       await generateCommitMessageCommand(context);
@@ -73,5 +75,6 @@ export function activate(context: vscode.ExtensionContext): void {
 }
 
 export function deactivate(): void {
+  disposeOutputChannel();
   statusBarItem = undefined;
 }

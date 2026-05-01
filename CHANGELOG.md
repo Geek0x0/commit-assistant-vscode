@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.1.0
+
+- **Multi-root workspace support** — When multiple git repositories are open, you are prompted to select the target repository before generating a commit message.
+- **OutputChannel logging** — Replaced `console.warn` with a dedicated VS Code OutputChannel ("Commit Assistant") for better diagnostics visibility.
+- **Improved error sanitization** — All error paths from custom model responses now sanitize API keys and tokens (previously only partial paths were covered). Additional patterns (`key-*`, `token-*`, `api_key=`) are now redacted.
+- **Stats data TTL cleanup** — Daily and monthly usage statistics are automatically pruned after 180 days to prevent unbounded `globalState` growth.
+- **Token usage tracking** — Token consumption is now tracked per model. Copilot models use character-based estimation; custom models report actual token counts from the API. Token totals are shown in the statistics dashboard.
+- **esbuild bundling** — Migrated from plain `tsc` to esbuild for smaller extension package size and faster load times.
+- **Expanded test coverage** — Increased from 57 to 88 tests across 9 test files (75% statements, 68% branches, 65% functions, 76% lines).
+
 ## 1.0.5
 
 - Improved status bar statistics tooltip — now renders as a formatted Markdown table with Model, Total, Today, and This Month columns.

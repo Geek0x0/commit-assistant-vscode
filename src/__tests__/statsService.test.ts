@@ -1,4 +1,4 @@
-import { getStats, recordUsage, clearStats, buildTooltipText } from '../services/statsService';
+import { getStats, recordUsage, clearStats, buildTooltipText, pruneStats } from '../services/statsService';
 import { setUiLanguage } from '../i18n';
 import type { StatsData } from '../types';
 
@@ -20,7 +20,7 @@ describe('getStats', () => {
   });
 
   test('returns stored stats', () => {
-    const data: StatsData = { models: { 'gpt-4.1': { daily: { '2025-01-01': 3 }, monthly: { '2025-01': 3 } } } };
+    const data: StatsData = { models: { 'gpt-4.1': { daily: { '2025-01-01': 3 }, monthly: { '2025-01': 3 }, totalTokens: 0 } } };
     const memento = createMockMemento(data);
     expect(getStats(memento as never)).toEqual(data);
   });
@@ -43,7 +43,7 @@ describe('getStats', () => {
   });
 
   test('returns a deep copy (mutations do not affect cache)', () => {
-    const data: StatsData = { models: { 'gpt-4.1': { daily: { '2025-01-01': 1 }, monthly: { '2025-01': 1 } } } };
+    const data: StatsData = { models: { 'gpt-4.1': { daily: { '2025-01-01': 1 }, monthly: { '2025-01': 1 }, totalTokens: 100 } } };
     const memento = createMockMemento(data);
     const stats = getStats(memento as never);
     stats.models['gpt-4.1']!.daily['2025-01-01'] = 999;
@@ -62,6 +62,7 @@ describe('recordUsage', () => {
     const now = new Date();
     const dayKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
     expect(store.models['gpt-4.1'].daily[dayKey]).toBe(1);
+    expect(store.models['gpt-4.1'].totalTokens).toBe(0);
   });
 
   test('increments existing model entry', async () => {
@@ -69,14 +70,15 @@ describe('recordUsage', () => {
     const dayKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
     const monthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     const data: StatsData = {
-      models: { 'gpt-4.1': { daily: { [dayKey]: 2 }, monthly: { [monthKey]: 2 } } }
+      models: { 'gpt-4.1': { daily: { [dayKey]: 2 }, monthly: { [monthKey]: 2 }, totalTokens: 500 } }
     };
     const memento = createMockMemento(data);
-    await recordUsage(memento as never, 'gpt-4.1');
+    await recordUsage(memento as never, 'gpt-4.1', { promptTokens: 100, completionTokens: 50, totalTokens: 150 });
 
     const store = memento._getStore() as StatsData;
     expect(store.models['gpt-4.1'].daily[dayKey]).toBe(3);
     expect(store.models['gpt-4.1'].monthly[monthKey]).toBe(3);
+    expect(store.models['gpt-4.1'].totalTokens).toBe(650);
   });
 
   test('tracks multiple models independently', async () => {
@@ -89,15 +91,61 @@ describe('recordUsage', () => {
     expect(store.models['gpt-4.1']).toBeDefined();
     expect(store.models['claude-sonnet']).toBeDefined();
   });
+
+  test('records token usage', async () => {
+    const memento = createMockMemento();
+    await recordUsage(memento as never, 'gpt-4.1', { promptTokens: 200, completionTokens: 100, totalTokens: 300 });
+
+    const store = memento._getStore() as StatsData;
+    expect(store.models['gpt-4.1'].totalTokens).toBe(300);
+  });
 });
 
 describe('clearStats', () => {
   test('clears all stats', async () => {
-    const data: StatsData = { models: { 'gpt-4.1': { daily: { '2025-01-01': 5 }, monthly: { '2025-01': 5 } } } };
+    const data: StatsData = { models: { 'gpt-4.1': { daily: { '2025-01-01': 5 }, monthly: { '2025-01': 5 }, totalTokens: 1000 } } };
     const memento = createMockMemento(data);
     await clearStats(memento as never);
 
     expect(memento._getStore()).toBeUndefined();
+  });
+});
+
+describe('pruneStats', () => {
+  test('removes daily entries older than TTL', () => {
+    const stats: StatsData = {
+      models: {
+        'gpt-4.1': {
+          daily: { '2020-01-01': 5, '2020-06-15': 3 },
+          monthly: { '2020-01': 5, '2020-06': 3 },
+          totalTokens: 0
+        }
+      }
+    };
+
+    const pruned = pruneStats(stats, 180);
+    expect(pruned.models['gpt-4.1']).toBeUndefined();
+  });
+
+  test('keeps recent entries', () => {
+    const now = new Date();
+    const dayKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    const monthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    const stats: StatsData = {
+      models: {
+        'gpt-4.1': {
+          daily: { [dayKey]: 5, '2020-01-01': 3 },
+          monthly: { [monthKey]: 5, '2020-01': 3 },
+          totalTokens: 100
+        }
+      }
+    };
+
+    const pruned = pruneStats(stats, 180);
+    expect(pruned.models['gpt-4.1'].daily[dayKey]).toBe(5);
+    expect(pruned.models['gpt-4.1'].monthly[monthKey]).toBe(5);
+    expect(pruned.models['gpt-4.1'].daily['2020-01-01']).toBeUndefined();
+    expect(pruned.models['gpt-4.1'].totalTokens).toBe(100);
   });
 });
 
@@ -117,7 +165,7 @@ describe('buildTooltipText', () => {
     const monthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
 
     const stats: StatsData = {
-      models: { 'gpt-4.1': { daily: { [dayKey]: 3, '2025-06-01': 2 }, monthly: { [monthKey]: 3 } } }
+      models: { 'gpt-4.1': { daily: { [dayKey]: 3, '2025-06-01': 2 }, monthly: { [monthKey]: 3 }, totalTokens: 500 } }
     };
 
     const text = buildTooltipText(stats);

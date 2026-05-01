@@ -2,7 +2,7 @@
   "name": "commit-assistant-kodyshi",
   "displayName": "Commit Assistant With AI",
   "description": "Generate Git commit messages with GitHub Copilot models.",
-  "version": "1.0.5",
+  "version": "1.1.0",
   "publisher": "KodyShi",
   "engines": {
     "vscode": "^1.95.0"
@@ -165,14 +165,19 @@
   "scripts": {
     "build": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "vscode:prepublish": "npm run build",
-    "package": "vsce package"
+    "esbuild": "node esbuild.js",
+    "esbuild:watch": "node esbuild.js --watch",
+    "esbuild:prod": "node esbuild.js --production",
+    "vscode:prepublish": "npm run esbuild:prod",
+    "package": "vsce package",
+    "test": "jest"
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",
     "@types/node": "^22.15.3",
     "@types/vscode": "^1.95.0",
     "@vscode/vsce": "^2.25.0",
+    "esbuild": "^0.28.0",
     "jest": "^30.3.0",
     "ts-jest": "^29.4.9",
     "typescript": "^5.8.3"

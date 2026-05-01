@@ -10,7 +10,8 @@ Generate Git commit messages with AI models — powered by GitHub Copilot or you
 - **Multiple Languages** — Generate commit messages in 15 supported languages.
 - **Commit Styles** — Choose from conventional, angular, semantic, emoji, and more.
 - **Source Control Integration** — One-click button in the SCM panel to generate messages.
-- **Usage Statistics** — Track daily/monthly generation counts per model via the status bar.
+- **Multi-Root Workspace** — When multiple git repositories are open, select the target repository from a quick pick.
+- **Usage Statistics** — Track daily/monthly generation counts and token usage per model via the status bar and dashboard.
 - **Bilingual UI** — Switch the extension UI between English and Chinese. All prompts, messages, validations, and errors are fully localized.
 
 ## Commands
@@ -35,7 +36,7 @@ Generate Git commit messages with AI models — powered by GitHub Copilot or you
 - **Commit Assistant: List Custom Models**
   - View all configured custom models.
 - **Commit Assistant: Show Statistics**
-  - Open a dashboard showing daily/monthly usage per model.
+  - Open a dashboard showing daily/monthly usage and token consumption per model.
 - **Commit Assistant: Clear Statistics**
   - Reset all usage statistics.
 
@@ -68,13 +69,22 @@ Then set `commitAssistant.model` to `custom:my-openai`.
 
 ## Usage Statistics
 
-A status bar item appears at the bottom-right of VSCode. Hover to see a formatted table with today's and this month's generation counts per model. Click to open a detailed dashboard.
+A status bar item appears at the bottom-right of VS Code. Hover to see a formatted table with today's and this month's generation counts per model. Click to open a detailed dashboard with:
+
+- Total generations per model
+- Token usage per model
+- Daily and monthly usage breakdowns with bar charts
+
+Statistics older than 180 days are automatically pruned.
 
 ## Development
 
 ```bash
 npm install
-npm run build
+npm run esbuild       # bundle with esbuild
+npm run esbuild:watch # watch mode
+npm run build         # compile with tsc (type checking)
+npm test              # run tests
 ```
 
 Run extension in debug host:
@@ -88,3 +98,4 @@ Run extension in debug host:
 - GitHub Copilot models require the GitHub Copilot extension and a valid subscription.
 - Custom models use OpenAI-compatible chat completions format.
 - URL security validation blocks private IPs and localhost for safety.
+- Token usage for Copilot models is estimated (~4 chars per token); custom models report actual usage from the API response.

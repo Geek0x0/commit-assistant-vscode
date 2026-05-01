@@ -5,3 +5,8 @@
 **/*.ts
 src/**
 tsconfig.json
+jest.config.js
+esbuild.js
+__tests__/**
+__mocks__/**
+coverage/**

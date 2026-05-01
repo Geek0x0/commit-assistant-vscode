@@ -28,6 +28,7 @@ interface Translation {
     selectLanguage: string;
     selectUiLanguage: string;
     selectCustomModelToRemove: string;
+    selectRepository: string;
   };
   messages: {
     generating: string;
@@ -92,6 +93,8 @@ interface Translation {
     period: string;
     count: string;
     statsCleared: string;
+    tokenUsage: string;
+    totalTokens: string;
   };
 }
 
@@ -123,7 +126,8 @@ const translations: Record<UiLanguage, Translation> = {
       selectStyle: 'Select commit message style',
       selectLanguage: 'Select output language for commit messages',
       selectUiLanguage: 'Select UI language',
-      selectCustomModelToRemove: 'Select a custom model to remove'
+      selectCustomModelToRemove: 'Select a custom model to remove',
+      selectRepository: 'Select a repository'
     },
     messages: {
       generating: 'Generating with',
@@ -187,7 +191,9 @@ const translations: Record<UiLanguage, Translation> = {
       date: 'Date',
       period: 'Period',
       count: 'Count',
-      statsCleared: 'Statistics cleared.'
+      statsCleared: 'Statistics cleared.',
+      tokenUsage: 'Token Usage',
+      totalTokens: 'Total Tokens'
     }
   },
   zh: {
@@ -217,7 +223,8 @@ const translations: Record<UiLanguage, Translation> = {
       selectStyle: '选择提交信息风格',
       selectLanguage: '选择提交信息的输出语言',
       selectUiLanguage: '选择界面语言',
-      selectCustomModelToRemove: '选择要移除的自定义模型'
+      selectCustomModelToRemove: '选择要移除的自定义模型',
+      selectRepository: '选择一个仓库'
     },
     messages: {
       generating: '正在使用 {model} 生成...',
@@ -281,7 +288,9 @@ const translations: Record<UiLanguage, Translation> = {
       date: '日期',
       period: '周期',
       count: '次数',
-      statsCleared: '统计已清除。'
+      statsCleared: '统计已清除。',
+      tokenUsage: 'Token 使用量',
+      totalTokens: '总 Token 数'
     }
   }
 };

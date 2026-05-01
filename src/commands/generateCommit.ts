@@ -6,6 +6,7 @@ import { generateWithCustomModel } from '../core/customModelService';
 import { buildPrompt, buildUserOnlyPrompt, normalizeModelOutput } from '../core/promptBuilder';
 import { recordUsage } from '../services/statsService';
 import { t, formatTemplate } from '../i18n';
+import type { TokenUsage } from '../types';
 
 export async function generateCommitMessageCommand(context: vscode.ExtensionContext): Promise<void> {
   const userInput = await vscode.window.showInputBox({
@@ -43,7 +44,7 @@ export async function generateCommitMessageCommand(context: vscode.ExtensionCont
           throw new Error(t().messages.invalidModelSetting);
         }
 
-        let result: { message: string; modelName: string };
+        let result: { message: string; modelName: string; tokenUsage?: TokenUsage };
 
         if (provider === 'custom') {
           const customModels = getCustomModels();
@@ -71,7 +72,7 @@ export async function generateCommitMessageCommand(context: vscode.ExtensionCont
         const inserted = await writeToScmInputBox(commitMessage);
         await vscode.env.clipboard.writeText(commitMessage);
 
-        await recordUsage(context.globalState, result.modelName);
+        await recordUsage(context.globalState, result.modelName, result.tokenUsage);
 
         if (inserted) {
           vscode.window.showInformationMessage(

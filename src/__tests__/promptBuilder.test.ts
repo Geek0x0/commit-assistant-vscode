@@ -1,4 +1,12 @@
-import { normalizeModelOutput } from '../core/promptBuilder';
+import { normalizeModelOutput, buildPrompt, buildUserOnlyPrompt } from '../core/promptBuilder';
+
+jest.mock('../config/settings', () => ({
+  getSettings: () => ({
+    style: 'conventional',
+    language: 'english',
+    maxDiffChars: 16000
+  })
+}));
 
 describe('normalizeModelOutput', () => {
   test('trims whitespace', () => {
@@ -44,5 +52,67 @@ describe('normalizeModelOutput', () => {
   test('preserves normal multi-line message', () => {
     const input = 'feat: add new feature\n\n- Added new module\n- Updated tests';
     expect(normalizeModelOutput(input)).toBe(input);
+  });
+});
+
+describe('buildPrompt', () => {
+  test('includes git context fields', () => {
+    const gitContext = {
+      repoPath: '/tmp/repo',
+      stagedDiff: 'diff --git a/file.ts',
+      unstagedDiff: '',
+      untrackedSummary: '',
+      changedFiles: ['file.ts'],
+      relatedHistory: 'abc123 2025-01-01 feat: init'
+    };
+
+    const prompt = buildPrompt(undefined, gitContext);
+    expect(prompt).toContain('/tmp/repo');
+    expect(prompt).toContain('file.ts');
+    expect(prompt).toContain('diff --git a/file.ts');
+    expect(prompt).toContain('abc123 2025-01-01 feat: init');
+    expect(prompt).toContain('No user intent was provided');
+  });
+
+  test('includes user intent when provided', () => {
+    const gitContext = {
+      repoPath: '/tmp/repo',
+      stagedDiff: '',
+      unstagedDiff: '',
+      untrackedSummary: '',
+      changedFiles: [],
+      relatedHistory: ''
+    };
+
+    const prompt = buildPrompt('fix login bug', gitContext);
+    expect(prompt).toContain('fix login bug');
+    expect(prompt).toContain('Use this intent as primary guidance');
+  });
+
+  test('shows (none) for empty fields', () => {
+    const gitContext = {
+      repoPath: '/tmp/repo',
+      stagedDiff: '',
+      unstagedDiff: '',
+      untrackedSummary: '',
+      changedFiles: [],
+      relatedHistory: ''
+    };
+
+    const prompt = buildPrompt(undefined, gitContext);
+    expect(prompt).toContain('(none)');
+  });
+});
+
+describe('buildUserOnlyPrompt', () => {
+  test('includes user intent', () => {
+    const prompt = buildUserOnlyPrompt('refactor authentication module');
+    expect(prompt).toContain('refactor authentication module');
+    expect(prompt).toContain('User intent for this commit');
+  });
+
+  test('includes language instruction', () => {
+    const prompt = buildUserOnlyPrompt('some intent');
+    expect(prompt).toContain('English');
   });
 });

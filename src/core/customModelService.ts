@@ -25,6 +25,11 @@ interface ChatCompletionResponse {
       content?: string;
     };
   }>;
+  usage?: {
+    prompt_tokens?: number;
+    completion_tokens?: number;
+    total_tokens?: number;
+  };
   error?: {
     message: string;
   };
@@ -50,10 +55,13 @@ export function isUrlAllowed(urlStr: string): boolean {
   return true;
 }
 
-function sanitizeErrorMessage(message: string): string {
+export function sanitizeErrorMessage(message: string): string {
   return message
     .replace(/sk-[a-zA-Z0-9_-]{20,}/g, '[REDACTED_API_KEY]')
-    .replace(/Bearer\s+\S+/g, 'Bearer [REDACTED]');
+    .replace(/Bearer\s+\S+/g, 'Bearer [REDACTED]')
+    .replace(/key-[a-zA-Z0-9_-]{20,}/g, '[REDACTED_API_KEY]')
+    .replace(/token-[a-zA-Z0-9_-]{20,}/g, '[REDACTED_TOKEN]')
+    .replace(/api[_-]?key[=:]\s*\S+/gi, 'api_key=[REDACTED]');
 }
 
 function makeRequest(
@@ -61,7 +69,7 @@ function makeRequest(
   body: unknown,
   apiKey: string,
   token: vscode.CancellationToken
-): Promise<string> {
+): Promise<{ content: string; usage?: { prompt_tokens?: number; completion_tokens?: number; total_tokens?: number } }> {
   return new Promise((resolve, reject) => {
     const url = new URL(urlStr);
     const isHttps = url.protocol === 'https:';
@@ -104,12 +112,12 @@ function makeRequest(
             }
             const content = json.choices?.[0]?.message?.content;
             if (typeof content !== 'string') {
-              reject(new Error('Unexpected response format from custom model API'));
+              reject(new Error(sanitizeErrorMessage('Unexpected response format from custom model API')));
               return;
             }
-            resolve(content);
+            resolve({ content, usage: json.usage });
           } catch {
-            reject(new Error('Invalid JSON response from custom model API'));
+            reject(new Error(sanitizeErrorMessage('Invalid JSON response from custom model API')));
           }
         } else {
           let message = `HTTP ${res.statusCode}`;
@@ -151,7 +159,7 @@ export async function generateWithCustomModel(
   config: CustomModelConfig,
   apiKey: string,
   token: vscode.CancellationToken
-): Promise<{ message: string; modelName: string }> {
+): Promise<{ message: string; modelName: string; tokenUsage?: { promptTokens: number; completionTokens: number; totalTokens: number } }> {
   const body = {
     model: config.model,
     messages: [{ role: 'user', content: prompt }],
@@ -159,10 +167,19 @@ export async function generateWithCustomModel(
     max_tokens: DEFAULT_MAX_TOKENS
   };
 
-  const text = await makeRequest(config.url, body, apiKey, token);
+  const result = await makeRequest(config.url, body, apiKey, token);
+
+  const tokenUsage = result.usage
+    ? {
+        promptTokens: result.usage.prompt_tokens ?? 0,
+        completionTokens: result.usage.completion_tokens ?? 0,
+        totalTokens: result.usage.total_tokens ?? 0
+      }
+    : undefined;
 
   return {
-    message: text,
-    modelName: `${config.name} (${config.model})`
+    message: result.content,
+    modelName: `${config.name} (${config.model})`,
+    tokenUsage
   };
 }

@@ -35,10 +35,11 @@ function buildStatsHtml(stats: StatsData): string {
   }
 
   const totalHtml = buildTotalSection(stats, models);
+  const tokenHtml = buildTokenSection(stats, models);
   const dailyHtml = buildDailySection(stats, models);
   const monthlyHtml = buildMonthlySection(stats, models);
 
-  return wrapHtml(totalHtml + dailyHtml + monthlyHtml);
+  return wrapHtml(totalHtml + tokenHtml + dailyHtml + monthlyHtml);
 }
 
 function buildTotalSection(stats: StatsData, models: string[]): string {
@@ -46,11 +47,50 @@ function buildTotalSection(stats: StatsData, models: string[]): string {
   let html = `<div class="summary"><h2>${escapeHtml(tr.totalLabel)}</h2>`;
 
   for (const model of models) {
-    const dailyTotal = Object.values(stats.models[model].daily).reduce((s, c) => s + c, 0);
-    html += `<div class="summary-item"><strong>${escapeHtml(model)}</strong>: ${dailyTotal}</div>`;
+    const ms = stats.models[model];
+    const dailyTotal = Object.values(ms.daily).reduce((s, c) => s + c, 0);
+    const tokens = ms.totalTokens ?? 0;
+    const tokenStr = tokens > 0 ? ` — ${tr.totalTokens}: ${tokens.toLocaleString()}` : '';
+    html += `<div class="summary-item"><strong>${escapeHtml(model)}</strong>: ${dailyTotal} ${tr.count}${tokenStr}</div>`;
   }
 
   html += '</div>';
+  return html;
+}
+
+function buildTokenSection(stats: StatsData, models: string[]): string {
+  const tr = t().stats;
+  const rows = models
+    .filter((model) => (stats.models[model].totalTokens ?? 0) > 0)
+    .map((model) => ({
+      model,
+      tokens: stats.models[model].totalTokens ?? 0
+    }));
+
+  if (rows.length === 0) {
+    return '';
+  }
+
+  const maxTokens = Math.max(...rows.map((r) => r.tokens), 1);
+
+  let html = `<h2>${escapeHtml(tr.tokenUsage)}</h2><table><thead><tr>`;
+  html += `<th>${escapeHtml(tr.model)}</th><th>${escapeHtml(tr.totalTokens)}</th><th></th>`;
+  html += '</tr></thead><tbody>';
+
+  for (const row of rows) {
+    const pct = Math.round((row.tokens / maxTokens) * 100);
+    html += `<tr>
+      <td>${escapeHtml(row.model)}</td>
+      <td>${row.tokens.toLocaleString()}</td>
+      <td style="width: 40%;">
+        <div class="bar-container">
+          <div class="bar" style="width: ${pct}%;"></div>
+        </div>
+      </td>
+    </tr>`;
+  }
+
+  html += '</tbody></table>';
   return html;
 }
 

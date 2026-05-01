@@ -14,14 +14,15 @@ module.exports = {
     'src/config/settings.ts',
     'src/i18n/index.ts',
     'src/services/statsService.ts',
-    'src/prompts/templates.ts'
+    'src/prompts/templates.ts',
+    'src/log.ts'
   ],
   coverageThreshold: {
     global: {
-      statements: 60,
-      branches: 40,
-      lines: 60,
-      functions: 40
+      statements: 70,
+      branches: 55,
+      lines: 70,
+      functions: 64
     }
   }
 };

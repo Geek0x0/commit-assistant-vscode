@@ -1,8 +1,9 @@
 import * as vscode from 'vscode';
-import type { StatsData } from '../types';
+import type { StatsData, TokenUsage } from '../types';
 import { t, formatTemplate } from '../i18n';
 
 const STATS_KEY = 'commitAssistant.stats';
+const TTL_DAYS = 180;
 
 function formatDate(date: Date): string {
   const y = date.getFullYear();
@@ -36,6 +37,45 @@ function isValidStatsData(value: unknown): value is StatsData {
   return true;
 }
 
+function isExpired(dateKey: string, ttlDays: number): boolean {
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - ttlDays);
+  const year = parseInt(dateKey.slice(0, 4), 10);
+  const month = parseInt(dateKey.slice(5, 7), 10) - 1;
+  const day = parseInt(dateKey.slice(8, 10), 10);
+  const entryDate = new Date(year, month, day);
+  return entryDate < cutoff;
+}
+
+function isExpiredMonth(monthKey: string, ttlDays: number): boolean {
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - ttlDays);
+  const cutoffMonth = `${cutoff.getFullYear()}-${String(cutoff.getMonth() + 1).padStart(2, '0')}`;
+  return monthKey < cutoffMonth;
+}
+
+export function pruneStats(stats: StatsData, ttlDays: number): StatsData {
+  const models: Record<string, StatsData['models'][string]> = {};
+  for (const [name, ms] of Object.entries(stats.models)) {
+    const daily: Record<string, number> = {};
+    for (const [key, count] of Object.entries(ms.daily)) {
+      if (!isExpired(key, ttlDays)) {
+        daily[key] = count;
+      }
+    }
+    const monthly: Record<string, number> = {};
+    for (const [key, count] of Object.entries(ms.monthly)) {
+      if (!isExpiredMonth(key, ttlDays)) {
+        monthly[key] = count;
+      }
+    }
+    if (Object.keys(daily).length > 0 || Object.keys(monthly).length > 0 || ms.totalTokens > 0) {
+      models[name] = { daily, monthly, totalTokens: ms.totalTokens ?? 0 };
+    }
+  }
+  return { models };
+}
+
 export function getStats(globalState: vscode.Memento): StatsData {
   const raw = globalState.get<StatsData>(STATS_KEY);
   if (!isValidStatsData(raw)) {
@@ -44,13 +84,17 @@ export function getStats(globalState: vscode.Memento): StatsData {
   return JSON.parse(JSON.stringify(raw)) as StatsData;
 }
 
-export async function recordUsage(globalState: vscode.Memento, model: string): Promise<void> {
+export async function recordUsage(
+  globalState: vscode.Memento,
+  model: string,
+  tokenUsage?: TokenUsage
+): Promise<void> {
   const stats = getStats(globalState);
   const now = new Date();
   const dayKey = formatDate(now);
   const monthKey = formatMonth(now);
 
-  const modelStats = stats.models[model] ?? { daily: {}, monthly: {} };
+  const modelStats = stats.models[model] ?? { daily: {}, monthly: {}, totalTokens: 0 };
 
   const newStats: StatsData = {
     models: {
@@ -63,12 +107,14 @@ export async function recordUsage(globalState: vscode.Memento, model: string): P
         monthly: {
           ...modelStats.monthly,
           [monthKey]: (modelStats.monthly[monthKey] ?? 0) + 1
-        }
+        },
+        totalTokens: (modelStats.totalTokens ?? 0) + (tokenUsage?.totalTokens ?? 0)
       }
     }
   };
 
-  await globalState.update(STATS_KEY, newStats);
+  const pruned = pruneStats(newStats, TTL_DAYS);
+  await globalState.update(STATS_KEY, pruned);
 }
 
 export async function clearStats(globalState: vscode.Memento): Promise<void> {

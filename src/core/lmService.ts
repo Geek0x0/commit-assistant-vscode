@@ -35,6 +35,10 @@ async function pickModel(preferredModel: string): Promise<vscode.LanguageModelCh
   return fallback ?? models[0];
 }
 
+function estimateTokens(text: string): number {
+  return Math.ceil(text.length / 4);
+}
+
 export async function listAvailableModelNames(): Promise<string[]> {
   const models = await vscode.lm.selectChatModels();
   const names = models
@@ -48,7 +52,7 @@ export async function generateWithCopilot(
   prompt: string,
   preferredModel: string,
   token: vscode.CancellationToken
-): Promise<{ message: string; modelName: string }> {
+): Promise<{ message: string; modelName: string; tokenUsage?: { promptTokens: number; completionTokens: number; totalTokens: number } }> {
   const model = await pickModel(preferredModel);
   const messages = [vscode.LanguageModelChatMessage.User(prompt)];
   const response = await model.sendRequest(messages, {}, token);
@@ -61,8 +65,16 @@ export async function generateWithCopilot(
     text += chunk;
   }
 
+  const promptTokens = estimateTokens(prompt);
+  const completionTokens = estimateTokens(text);
+
   return {
     message: text,
-    modelName: model.name ?? preferredModel
+    modelName: model.name ?? preferredModel,
+    tokenUsage: {
+      promptTokens,
+      completionTokens,
+      totalTokens: promptTokens + completionTokens
+    }
   };
 }

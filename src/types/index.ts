@@ -68,8 +68,15 @@ export interface CustomModelConfig {
 export interface ModelStats {
   daily: Record<string, number>;
   monthly: Record<string, number>;
+  totalTokens: number;
 }
 
 export interface StatsData {
   models: Record<string, ModelStats>;
+}
+
+export interface TokenUsage {
+  promptTokens: number;
+  completionTokens: number;
+  totalTokens: number;
 }

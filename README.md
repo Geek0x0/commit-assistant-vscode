@@ -49,6 +49,7 @@ Generate Git commit messages with AI models — powered by GitHub Copilot or you
 | `commitAssistant.language` | `enum` | `english` | Output language for commit messages. |
 | `commitAssistant.uiLanguage` | `enum` | `en` | UI language (`en` or `zh`). |
 | `commitAssistant.maxDiffChars` | `number` | `16000` | Maximum diff characters sent to the model (2000–60000). |
+| `commitAssistant.stagedOnly` | `boolean` | `false` | Only analyze staged changes when generating commit messages. Unstaged and untracked changes are ignored. |
 | `commitAssistant.customModels` | `array` | `[]` | Custom model configurations (`name`, `url`, `model`). |
 
 ### Supported Output Languages

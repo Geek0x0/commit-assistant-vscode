@@ -47,6 +47,7 @@ export interface ExtensionSettings {
   style: CommitStyle;
   language: CommitLanguage;
   maxDiffChars: number;
+  stagedOnly: boolean;
   uiLanguage: UiLanguage;
 }
 

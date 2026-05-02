@@ -14,6 +14,7 @@ export function getSettings(): ExtensionSettings {
     style: cfg.get<CommitStyle>('style', 'conventional'),
     language: cfg.get<CommitLanguage>('language', 'english'),
     maxDiffChars: cfg.get<number>('maxDiffChars', 16000),
+    stagedOnly: cfg.get<boolean>('stagedOnly', false),
     uiLanguage: cfg.get<UiLanguage>('uiLanguage', 'en')
   };
 }

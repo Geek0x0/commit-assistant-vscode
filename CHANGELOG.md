@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1
+
+- **Staged-only mode** — New `commitAssistant.stagedOnly` setting (default: `false`). When enabled, commit messages are generated using only staged changes — unstaged diffs and untracked files are skipped, ensuring the message matches what `git commit` will actually commit.
+
 ## 1.1.0
 
 - **Multi-root workspace support** — When multiple git repositories are open, you are prompted to select the target repository before generating a commit message.

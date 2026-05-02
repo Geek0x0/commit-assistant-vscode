@@ -161,24 +161,29 @@ export async function collectGitContext(token?: vscode.CancellationToken): Promi
   const repoPath = await getWorkspaceRepoPath(token);
   throwIfCancelled(token);
 
-  const { maxDiffChars } = getSettings();
+  const { maxDiffChars, stagedOnly } = getSettings();
 
   throwIfCancelled(token);
   const stagedDiff = truncate(await runGit(repoPath, ['diff', '--cached', '--no-color', '--']), maxDiffChars);
   throwIfCancelled(token);
-  const unstagedDiff = truncate(await runGit(repoPath, ['diff', '--no-color', '--']), maxDiffChars);
-
-  throwIfCancelled(token);
   const stagedFiles = await runGit(repoPath, ['diff', '--cached', '--name-only']);
-  throwIfCancelled(token);
-  const unstagedFiles = await runGit(repoPath, ['diff', '--name-only']);
-  throwIfCancelled(token);
-  const untrackedFilesRaw = await runGit(repoPath, ['ls-files', '--others', '--exclude-standard']);
 
-  const untrackedFiles = untrackedFilesRaw
-    .split('\n')
-    .map((line) => line.trim())
-    .filter(Boolean);
+  let unstagedDiff = '';
+  let unstagedFiles = '';
+  let untrackedFiles: string[] = [];
+
+  if (!stagedOnly) {
+    throwIfCancelled(token);
+    unstagedDiff = truncate(await runGit(repoPath, ['diff', '--no-color', '--']), maxDiffChars);
+    throwIfCancelled(token);
+    unstagedFiles = await runGit(repoPath, ['diff', '--name-only']);
+    throwIfCancelled(token);
+    const untrackedFilesRaw = await runGit(repoPath, ['ls-files', '--others', '--exclude-standard']);
+    untrackedFiles = untrackedFilesRaw
+      .split('\n')
+      .map((line) => line.trim())
+      .filter(Boolean);
+  }
 
   const changedFiles = Array.from(
     new Set(
@@ -188,11 +193,19 @@ export async function collectGitContext(token?: vscode.CancellationToken): Promi
     )
   );
 
-  if (!stagedDiff && !unstagedDiff && changedFiles.length === 0) {
-    throw new Error(t().messages.noChanges);
+  if (stagedOnly) {
+    if (!stagedDiff && stagedFiles.trim().length === 0) {
+      throw new Error(t().messages.noChanges);
+    }
+  } else {
+    if (!stagedDiff && !unstagedDiff && changedFiles.length === 0) {
+      throw new Error(t().messages.noChanges);
+    }
   }
 
-  const untrackedSummary = await summarizeUntracked(repoPath, untrackedFiles, Math.floor(maxDiffChars / 2), token);
+  const untrackedSummary = stagedOnly
+    ? ''
+    : await summarizeUntracked(repoPath, untrackedFiles, Math.floor(maxDiffChars / 2), token);
   const relatedHistory = truncate(
     await getRelatedHistory(repoPath, changedFiles, token),
     Math.floor(maxDiffChars / 2)

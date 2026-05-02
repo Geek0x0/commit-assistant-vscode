@@ -2,7 +2,7 @@
   "name": "commit-assistant-kodyshi",
   "displayName": "Commit Assistant With AI",
   "description": "Generate Git commit messages with GitHub Copilot models.",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "publisher": "KodyShi",
   "engines": {
     "vscode": "^1.95.0"
@@ -130,6 +130,11 @@
           "minimum": 2000,
           "maximum": 60000,
           "description": "Maximum diff characters sent to the model."
+        },
+        "commitAssistant.stagedOnly": {
+          "type": "boolean",
+          "default": false,
+          "description": "Only analyze staged changes when generating commit messages. When enabled, unstaged and untracked changes are ignored."
         },
         "commitAssistant.customModels": {
           "type": "array",

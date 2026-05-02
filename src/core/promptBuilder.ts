@@ -72,6 +72,10 @@ export function buildPrompt(userInput: string | undefined, context: GitContext):
     ? `User intent for this commit:\n${userInput.trim()}\n\nUse this intent as primary guidance.`
     : 'No user intent was provided. Infer the best commit message directly from code changes and file history.';
 
+  const unstagedBlock = settings.stagedOnly
+    ? ''
+    : `\nUnstaged diff:\n${context.unstagedDiff || '(none)'}\n\nUntracked summary:\n${context.untrackedSummary || '(none)'}`;
+
   return `${stylePrompt}
 
 ${intentBlock}
@@ -83,13 +87,7 @@ Changed files:
 ${context.changedFiles.length > 0 ? context.changedFiles.map((f) => `- ${f}`).join('\n') : '(none)'}
 
 Staged diff:
-${context.stagedDiff || '(none)'}
-
-Unstaged diff:
-${context.unstagedDiff || '(none)'}
-
-Untracked summary:
-${context.untrackedSummary || '(none)'}
+${context.stagedDiff || '(none)'}${unstagedBlock}
 
 Related history:
 ${context.relatedHistory || '(none)'}

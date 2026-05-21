@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.2.0
+
+- **Edit custom models** — Added `Commit Assistant: Edit Custom Model` command to update an existing custom model's name, URL, model ID, and API key.
+- **Safer API key handling during edit** — API key input can be left empty to keep the existing key; when renaming a model, existing secrets are migrated to the new model key.
+- **Active model rename sync** — If the currently selected model is renamed, `commitAssistant.model` is automatically updated to the new `custom:<name>` value.
+- **Localization updates** — Added full English and Chinese UI strings for the edit command prompts, messages, and errors.
+- **Test coverage expansion** — Added dedicated tests for custom model editing and model-selection synchronization on rename.
+
 ## 1.1.1
 
 - **Staged-only mode** — New `commitAssistant.stagedOnly` setting (default: `false`). When enabled, commit messages are generated using only staged changes — unstaged diffs and untracked files are skipped, ensuring the message matches what `git commit` will actually commit.

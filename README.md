@@ -72,6 +72,12 @@ You can use any OpenAI-compatible API endpoint as a custom model:
 Then set `commitAssistant.model` to `custom:my-openai`.
 You can later run **Commit Assistant: Edit Custom Model** to change its name, endpoint, model ID, or API key.
 
+Edit behavior details:
+
+- Leave API key empty during edit to keep the currently stored key.
+- When renaming a custom model, the extension migrates the stored API key to the new model name automatically.
+- If the renamed model is currently selected, `commitAssistant.model` is updated automatically.
+
 ## Usage Statistics
 
 A status bar item appears at the bottom-right of VS Code. Hover to see a formatted table with today's and this month's generation counts per model. Click to open a detailed dashboard with:

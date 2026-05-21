@@ -8,6 +8,7 @@ interface Translation {
     switchLanguage: string;
     switchUiLanguage: string;
     addCustomModel: string;
+    editCustomModel: string;
     removeCustomModel: string;
     listCustomModels: string;
     showStats: string;
@@ -19,6 +20,7 @@ interface Translation {
     modelName: string;
     modelNamePlaceholder: string;
     apiKey: string;
+    apiKeyOptional: string;
     url: string;
     urlPlaceholder: string;
     modelId: string;
@@ -27,6 +29,7 @@ interface Translation {
     selectStyle: string;
     selectLanguage: string;
     selectUiLanguage: string;
+    selectCustomModelToEdit: string;
     selectCustomModelToRemove: string;
     selectRepository: string;
   };
@@ -39,6 +42,7 @@ interface Translation {
     languageSet: string;
     uiLanguageSet: string;
     customModelAdded: string;
+    customModelUpdated: string;
     customModelRemoved: string;
     noCustomModels: string;
     commitGeneratedInserted: string;
@@ -61,6 +65,7 @@ interface Translation {
     switchStyleFailed: string;
     switchLanguageFailed: string;
     addModelFailed: string;
+    editModelFailed: string;
     removeModelFailed: string;
     requestFailed: string;
     requestTimeout: string;
@@ -107,6 +112,7 @@ const translations: Record<UiLanguage, Translation> = {
       switchLanguage: 'Commit Assistant: Switch Language',
       switchUiLanguage: 'Commit Assistant: Switch UI Language',
       addCustomModel: 'Commit Assistant: Add Custom Model',
+      editCustomModel: 'Commit Assistant: Edit Custom Model',
       removeCustomModel: 'Commit Assistant: Remove Custom Model',
       listCustomModels: 'Commit Assistant: List Custom Models',
       showStats: 'Commit Assistant: Show Statistics',
@@ -118,6 +124,7 @@ const translations: Record<UiLanguage, Translation> = {
       modelName: 'Enter a unique name for this custom model (e.g., my-openai)',
       modelNamePlaceholder: 'my-openai',
       apiKey: 'Enter API key for',
+      apiKeyOptional: 'Enter API key for {name} (leave blank to keep the existing key)',
       url: 'Enter API endpoint URL for',
       urlPlaceholder: 'https://api.openai.com/v1/chat/completions',
       modelId: 'Enter model name for',
@@ -126,6 +133,7 @@ const translations: Record<UiLanguage, Translation> = {
       selectStyle: 'Select commit message style',
       selectLanguage: 'Select output language for commit messages',
       selectUiLanguage: 'Select UI language',
+      selectCustomModelToEdit: 'Select a custom model to edit',
       selectCustomModelToRemove: 'Select a custom model to remove',
       selectRepository: 'Select a repository'
     },
@@ -138,6 +146,7 @@ const translations: Record<UiLanguage, Translation> = {
       languageSet: 'Commit Assistant language set to:',
       uiLanguageSet: 'Commit Assistant UI language set to:',
       customModelAdded: 'Custom model added successfully.',
+      customModelUpdated: 'Custom model updated successfully.',
       customModelRemoved: 'Custom model removed.',
       noCustomModels: 'No custom models configured.',
       commitGeneratedInserted: 'Commit message generated with {model} and inserted into SCM input.',
@@ -160,6 +169,7 @@ const translations: Record<UiLanguage, Translation> = {
       switchStyleFailed: 'Failed to switch style:',
       switchLanguageFailed: 'Failed to switch language:',
       addModelFailed: 'Failed to add custom model:',
+      editModelFailed: 'Failed to edit custom model:',
       removeModelFailed: 'Failed to remove custom model:',
       requestFailed: 'Custom model request failed. Please check your network and API configuration.',
       requestTimeout: 'Request timed out after 60s'
@@ -204,6 +214,7 @@ const translations: Record<UiLanguage, Translation> = {
       switchLanguage: '提交助手：切换语言',
       switchUiLanguage: '提交助手：切换界面语言',
       addCustomModel: '提交助手：添加自定义模型',
+      editCustomModel: '提交助手：编辑自定义模型',
       removeCustomModel: '提交助手：移除自定义模型',
       listCustomModels: '提交助手：列出自定义模型',
       showStats: '提交助手：显示统计',
@@ -215,6 +226,7 @@ const translations: Record<UiLanguage, Translation> = {
       modelName: '为此自定义模型输入唯一名称（例如：my-openai）',
       modelNamePlaceholder: 'my-openai',
       apiKey: '为"{name}"输入 API 密钥',
+      apiKeyOptional: '为"{name}"输入 API 密钥（留空可保留现有密钥）',
       url: '为"{name}"输入 API 端点 URL',
       urlPlaceholder: 'https://api.openai.com/v1/chat/completions',
       modelId: '为"{name}"输入模型名称',
@@ -223,6 +235,7 @@ const translations: Record<UiLanguage, Translation> = {
       selectStyle: '选择提交信息风格',
       selectLanguage: '选择提交信息的输出语言',
       selectUiLanguage: '选择界面语言',
+      selectCustomModelToEdit: '选择要编辑的自定义模型',
       selectCustomModelToRemove: '选择要移除的自定义模型',
       selectRepository: '选择一个仓库'
     },
@@ -235,6 +248,7 @@ const translations: Record<UiLanguage, Translation> = {
       languageSet: '提交助手语言已设置为：',
       uiLanguageSet: '提交助手界面语言已设置为：',
       customModelAdded: '自定义模型添加成功。',
+      customModelUpdated: '自定义模型更新成功。',
       customModelRemoved: '自定义模型已移除。',
       noCustomModels: '未配置自定义模型。',
       commitGeneratedInserted: '已使用 {model} 生成提交信息并插入到 SCM 输入框。',
@@ -257,6 +271,7 @@ const translations: Record<UiLanguage, Translation> = {
       switchStyleFailed: '切换风格失败：',
       switchLanguageFailed: '切换语言失败：',
       addModelFailed: '添加自定义模型失败：',
+      editModelFailed: '编辑自定义模型失败：',
       removeModelFailed: '移除自定义模型失败：',
       requestFailed: '自定义模型请求失败。请检查网络和 API 配置。',
       requestTimeout: '请求超时（60秒）'

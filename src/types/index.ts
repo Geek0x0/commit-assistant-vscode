@@ -5,6 +5,7 @@ export const COMMANDS = {
   switchLanguage: 'commitAssistant.switchLanguage',
   switchUiLanguage: 'commitAssistant.switchUiLanguage',
   addCustomModel: 'commitAssistant.addCustomModel',
+  editCustomModel: 'commitAssistant.editCustomModel',
   removeCustomModel: 'commitAssistant.removeCustomModel',
   listCustomModels: 'commitAssistant.listCustomModels',
   showStats: 'commitAssistant.showStats',

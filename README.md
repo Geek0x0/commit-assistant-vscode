@@ -31,6 +31,9 @@ Generate Git commit messages with AI models — powered by GitHub Copilot or you
 - **Commit Assistant: Add Custom Model**
   - Register a custom AI model by providing name, API key, URL, and model ID.
   - API keys are securely stored in VSCode SecretStorage.
+- **Commit Assistant: Edit Custom Model**
+  - Update an existing custom model's name, API key, URL, or model ID.
+  - Leave API key empty to keep the current key.
 - **Commit Assistant: Remove Custom Model**
   - Remove a previously added custom model.
 - **Commit Assistant: List Custom Models**
@@ -67,6 +70,7 @@ You can use any OpenAI-compatible API endpoint as a custom model:
 5. Enter the model name (e.g., `gpt-4o`).
 
 Then set `commitAssistant.model` to `custom:my-openai`.
+You can later run **Commit Assistant: Edit Custom Model** to change its name, endpoint, model ID, or API key.
 
 ## Usage Statistics
 

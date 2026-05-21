@@ -10,6 +10,7 @@ import { switchLanguageCommand } from './commands/switchLanguage';
 import { switchUiLanguageCommand } from './commands/switchUiLanguage';
 import {
   addCustomModelCommand,
+  editCustomModelCommand,
   removeCustomModelCommand,
   listCustomModelsCommand
 } from './commands/customModelManager';
@@ -50,6 +51,7 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.commands.registerCommand(COMMANDS.switchLanguage, switchLanguageCommand),
     vscode.commands.registerCommand(COMMANDS.switchUiLanguage, switchUiLanguageCommand),
     vscode.commands.registerCommand(COMMANDS.addCustomModel, () => addCustomModelCommand(context)),
+    vscode.commands.registerCommand(COMMANDS.editCustomModel, () => editCustomModelCommand(context)),
     vscode.commands.registerCommand(COMMANDS.removeCustomModel, () => removeCustomModelCommand(context)),
     vscode.commands.registerCommand(COMMANDS.listCustomModels, listCustomModelsCommand),
     vscode.commands.registerCommand(COMMANDS.showStats, () => openStatsWebview(context)),
@@ -67,6 +69,7 @@ export function activate(context: vscode.ExtensionContext): void {
     switchLanguage: t().commands.switchLanguage,
     switchUiLanguage: t().commands.switchUiLanguage,
     addCustomModel: t().commands.addCustomModel,
+    editCustomModel: t().commands.editCustomModel,
     removeCustomModel: t().commands.removeCustomModel,
     listCustomModels: t().commands.listCustomModels,
     showStats: t().commands.showStats,

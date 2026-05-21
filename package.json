@@ -52,6 +52,10 @@
         "title": "Commit Assistant: Add Custom Model"
       },
       {
+        "command": "commitAssistant.editCustomModel",
+        "title": "Commit Assistant: Edit Custom Model"
+      },
+      {
         "command": "commitAssistant.removeCustomModel",
         "title": "Commit Assistant: Remove Custom Model"
       },

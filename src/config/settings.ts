@@ -23,6 +23,16 @@ export async function setModel(model: string): Promise<void> {
   await config().update('model', model, vscode.ConfigurationTarget.Global);
 }
 
+export async function syncRenamedCustomModelSelection(oldName: string, newName: string): Promise<void> {
+  const currentModel = getSettings().model;
+
+  if (currentModel !== `custom:${oldName}`) {
+    return;
+  }
+
+  await setModel(`custom:${newName}`);
+}
+
 export async function setStyle(style: CommitStyle): Promise<void> {
   await config().update('style', style, vscode.ConfigurationTarget.Global);
 }
